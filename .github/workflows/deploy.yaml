@@ -8,19 +8,47 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout repository
+      # Checkout the repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Kubernetes configuration
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.K8S_CONFIG }}" > ~/.kube/config
-
+      # Set up kubectl
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v1
+        uses: google-github-actions/setup-kubectl@v0.2.0
 
-      - name: Deploy to Minikube
+      # Decode Kubernetes config and create kubeconfig
+      - name: Create Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "$K8S_CLIENT_CERT" | base64 -d > $HOME/.kube/client.crt
+          echo "$K8S_CLIENT_KEY" | base64 -d > $HOME/.kube/client.key
+          echo "$K8S_CA_CRT" | base64 -d > $HOME/.kube/ca.crt
+          echo "
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: $HOME/.kube/ca.crt
+              server: https://127.0.0.1:53695
+            name: minikube
+          contexts:
+          - context:
+              cluster: minikube
+              user: minikube
+            name: minikube
+          current-context: minikube
+          kind: Config
+          preferences: {}
+          users:
+          - name: minikube
+            user:
+              client-certificate: $HOME/.kube/client.crt
+              client-key: $HOME/.kube/client.key
+          " > $HOME/.kube/config
+
+      # Deploy to Kubernetes
+      - name: Apply Kubernetes Resources
         run: |
           kubectl apply -f services/examination/kubernetes.yaml
           kubectl apply -f services/attendance/kubernetes.yaml
