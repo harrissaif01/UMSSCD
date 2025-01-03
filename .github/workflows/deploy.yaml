@@ -47,6 +47,15 @@ jobs:
               client-key: $HOME/.kube/client.key
           " > $HOME/.kube/config
 
+      # Ensure minikube is running in GitHub Actions (since you are using Minikube locally)
+      - name: Start Minikube Cluster
+        run: |
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          sudo mv minikube-linux-amd64 /usr/local/bin/minikube
+          sudo chmod +x /usr/local/bin/minikube
+          minikube start --driver=docker
+          minikube kubectl -- get pods
+
       # Deploy to Kubernetes
       - name: Apply Kubernetes Resources
         run: |
