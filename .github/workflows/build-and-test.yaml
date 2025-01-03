@@ -1,0 +1,61 @@
+name: Build and Test Service
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Install dependencies for testing
+      - name: Install Dependencies
+        run: |
+          cd services/examination && npm install
+          cd ../attendance && npm install
+          cd ../faculty && npm install
+          cd ../student && npm install
+
+      # Run tests for each service
+      - name: Run Tests
+        run: |
+          cd services/examination && npm test
+          cd ../attendance && npm test
+          cd ../faculty && npm test
+          cd ../student && npm test
+
+      # Build Docker images for each service
+      - name: Build Docker Images
+        run: |
+          docker build -t examination-service services/examination
+          docker build -t attendance-service services/attendance
+          docker build -t faculty-service services/faculty
+          docker build -t student-service services/student
+
+      # Push Docker images to Docker Hub (or another registry)
+      - name: Push Docker Images
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push examination-service
+          docker push attendance-service
+          docker push faculty-service
+          docker push student-service
