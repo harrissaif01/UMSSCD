@@ -2,21 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: attendance-service
+  labels:
+    app: attendance-service
 spec:
-  replicas: 2
+  replicas: 2  # Number of pods to run
   selector:
     matchLabels:
-      app: attendance
+      app: attendance-service
   template:
     metadata:
       labels:
-        app: attendance
+        app: attendance-service
     spec:
       containers:
-        - name: attendance
-          image: attendance-service:latest
+        - name: attendance-service
+          image: ${{ secrets.DOCKER_USERNAME }}/attendance-service:latest  # Docker Hub username
           ports:
-            - containerPort: 3001
+            - containerPort: 3000
+
 ---
 apiVersion: v1
 kind: Service
@@ -24,9 +27,9 @@ metadata:
   name: attendance-service
 spec:
   selector:
-    app: attendance
+    app: attendance-service
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3001
-  type: ClusterIP
+      targetPort: 3000  # Port on which the container listens
+  type: ClusterIP  # Change to LoadBalancer for external access (if required)

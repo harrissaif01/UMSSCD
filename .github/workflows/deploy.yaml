@@ -1,0 +1,28 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Kubernetes configuration
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.K8S_CONFIG }}" > ~/.kube/config
+
+      - name: Set up kubectl
+        uses: google-github-actions/setup-kubectl@v0.3.0
+
+      - name: Deploy to Minikube
+        run: |
+          kubectl apply -f services/examination/kubernetes.yaml
+          kubectl apply -f services/attendance/kubernetes.yaml
+          kubectl apply -f services/faculty/kubernetes.yaml
+          kubectl apply -f services/student/kubernetes.yaml

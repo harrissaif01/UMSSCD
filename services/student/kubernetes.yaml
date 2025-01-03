@@ -2,21 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: student-service
+  labels:
+    app: student-service
 spec:
-  replicas: 2
+  replicas: 2  # Number of pods to run
   selector:
     matchLabels:
-      app: student
+      app: student-service
   template:
     metadata:
       labels:
-        app: student
+        app: student-service
     spec:
       containers:
-        - name: student
-          image: student-service:latest
+        - name: student-service
+          image: ${{ secrets.DOCKER_USERNAME }}/student-service:latest  # Docker Hub username
           ports:
-            - containerPort: 3003
+            - containerPort: 3000
+
 ---
 apiVersion: v1
 kind: Service
@@ -24,9 +27,9 @@ metadata:
   name: student-service
 spec:
   selector:
-    app: student
+    app: student-service
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3003
-  type: ClusterIP
+      targetPort: 3000  # Port on which the container listens
+  type: ClusterIP  # Change to LoadBalancer for external access (if required)
