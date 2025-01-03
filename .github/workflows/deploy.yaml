@@ -18,7 +18,7 @@ jobs:
           echo "${{ secrets.K8S_CONFIG }}" > ~/.kube/config
 
       - name: Set up kubectl
-        uses: google-github-actions/setup-kubectl@v0.3.0
+        uses: azure/setup-kubectl@v1
 
       - name: Deploy to Minikube
         run: |
