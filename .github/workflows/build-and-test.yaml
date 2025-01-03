@@ -43,13 +43,13 @@ jobs:
           cd ../faculty && npm test
           cd ../student && npm test
 
-      # Build Docker images for each service
+      # Build Docker images for each service with Docker Hub username
       - name: Build Docker Images
         run: |
-          docker build -t examination-service services/examination
-          docker build -t attendance-service services/attendance
-          docker build -t faculty-service services/faculty
-          docker build -t student-service services/student
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/examination-service services/examination
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/attendance-service services/attendance
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/faculty-service services/faculty
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/student-service services/student
 
       # Log in to Docker Hub securely and push the images
       - name: Log in to Docker Hub
@@ -59,7 +59,7 @@ jobs:
       # Push Docker images to Docker Hub (or another container registry)
       - name: Push Docker Images
         run: |
-          docker push examination-service
-          docker push attendance-service
-          docker push faculty-service
-          docker push student-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/examination-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/attendance-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/faculty-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/student-service
