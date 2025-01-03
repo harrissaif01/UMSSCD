@@ -28,7 +28,7 @@ jobs:
           node-version: '18'
 
       # Install dependencies for testing
-      - name: Install Dependencies
+      - name: Install Dependencies for Each Service
         run: |
           cd services/examination && npm install
           cd ../attendance && npm install
@@ -51,11 +51,15 @@ jobs:
           docker build -t faculty-service services/faculty
           docker build -t student-service services/student
 
-      # Push Docker images to Docker Hub (or another registry)
-       - name: Push Docker Images
-  run: |
-    echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-    docker push examination-service
-    docker push attendance-service
-    docker push faculty-service
-    docker push student-service
+      # Log in to Docker Hub securely and push the images
+      - name: Log in to Docker Hub
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      # Push Docker images to Docker Hub (or another container registry)
+      - name: Push Docker Images
+        run: |
+          docker push examination-service
+          docker push attendance-service
+          docker push faculty-service
+          docker push student-service
