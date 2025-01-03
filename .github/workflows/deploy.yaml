@@ -14,9 +14,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # Set up kubectl (using Azure's setup-kubectl action)
+      # Set up kubectl using Azure's setup-kubectl action
       - name: Set up kubectl
-        uses: Azure/k8s-actions/setup-kubectl@v1
+        uses: azure/setup-kubectl@v1
 
       # Decode Kubernetes config and create kubeconfig
       - name: Create Kubeconfig
